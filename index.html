@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EA 2 - 2D Geometrie mit WebGL</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+
+<body data-bs-spy="scroll" data-bs-target=".navbar" data-bs-offset="70">
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">EA 3 - Farbig gefüllte 2D Geometrie</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="#poly">Poly Art</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#documentationSection">Dokumentation</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 pt-5" id="mainContent">
+        <section id="poly" class="mb-4">
+            <h2>Poly Art</h2>
+            <canvas id="webglCanvas" width="400" height="600"></canvas>
+        </section>
+
+        <section id="documentationSection" class="mb-4">
+            <h2>Dokumentation</h2>
+
+                <p>Inspiriert von einem Poly-Art-Bild <a href="https://www.vhv.rs/viewpic/howmoio_drawing-polygons-poly-art-polygon-wireframe-face-hd/" target="_blank">(Link zum Original)</a>, das einen Wireframe eines menschlichen Kopfes darstellt, wollte ich eine ähnliche Darstellung in WebGL umsetzen. Da es jedoch sehr aufwendig wäre, die Polygone und Eckpunkte des Wireframes manuell zu definieren und in WebGL nachzubilden, entschied ich mich für einen automatisierten Ansatz zur Punkterkennung mithilfe von Python und OpenCV.</p>
+
+                <p>Zunächst habe ich ein Python-Skript entwickelt <a href="./OpenCV-Konturen.txt" target="_blank">(Link zum Skript)</a>, das die Eckpunkte und Konturen des Wireframe-Bildes automatisch extrahiert. Dazu wurde das Bild zunächst in Graustufen konvertiert und der Kontrast verstärkt, um die Linien des Wireframes deutlicher hervorzuheben. Anschließend glättete ich das Bild mit einem Gaußschen Filter, um Rauschen zu reduzieren und die Kanten klarer darzustellen. Mit dem Canny-Algorithmus zur Kantendetektion konnte ich dann die Hauptlinien des Bildes isolieren.</p>
+
+                <p>Die nächste Herausforderung bestand darin, aus den gefundenen Kanten Konturen zu extrahieren und diese in eine Polygon-Form zu bringen. Dafür nutzte ich die Funktion zur Konturenerkennung von OpenCV, die es ermöglichte, die Kanten in zusammenhängende Formen umzuwandeln. Mithilfe einer Polygon-Approximation für jede gefundene Kontur reduzierte ich die Anzahl der Eckpunkte, sodass jedes Polygon eine vereinfachte Darstellung der ursprünglichen Kontur darstellt. Dies war notwendig, um die Daten für die effiziente Darstellung in WebGL vorzubereiten. Die gewonnenen Polygon-Koordinaten wurden dann in ein Array exportiert, das später in der WebGL-Anwendung geladen und gerendert wird.</p>
+
+                <p>In der WebGL-Anwendung werden die importierten Polygon-Koordinaten verwendet, um die Wireframe-Form des Kopfes nachzubilden. Da WebGL nur mit normierten Koordinaten im Bereich von -1 bis 1 arbeitet, mussten die Eckpunkte zunächst skaliert und verschoben werden. Dazu wurden die Minimal- und Maximalwerte der Koordinaten berechnet, um eine Skalierung und Verschiebung für die Normalisierung anzuwenden, sodass die Polygone den gesamten Zeichenbereich des WebGL-Canvas abdecken.</p>
+
+                <p>Um die Polygone zu rendern, habe ich zwei Shader implementiert: einen Vertex-Shader zur Festlegung der Positionen der Eckpunkte und einen Fragment-Shader, der die Farben der Pixel definiert. Die Polygone werden als <code>gl.TRIANGLE_FAN</code> gezeichnet, was eine einfache Methode für flächenhafte Polygone darstellt. Eine Funktion erkennt bestimmte Polygon-Koordinaten, die den Augen entsprechen, und färbt diese in einem konstanten Blau. Die restlichen Polygone werden zufällig aus einem Array von Hauttönen gefärbt, das verschiedene RGBA-Werte für helle bis dunkle Hautfarben enthält. Jedes Mal, wenn die Anwendung neu geladen wird, erhalten die Polygone einen zufälligen Hautton, wodurch die Darstellung dynamisch wirkt.</p>
+
+        </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
